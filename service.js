@@ -15,9 +15,9 @@ const recuperarMaioresSaldos = (lancamentos) => {
 
 // percorrer o array dos lançamentos e adicionar o saldo
 
-   for (let i = 0; i < lancamentos.length; i++) {
-     let cpf = lancamentos[i].cpf;
-     let valor = lancamentos[i].valor;
+   for (let lancamento of lancamentos) {
+     let cpf = lancamento.cpf;
+     let valor = lancamento.valor;
  
      if (saldos[cpf]) {
        saldos[cpf] += valor;
