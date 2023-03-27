@@ -11,7 +11,7 @@ const recuperarMaiorMenorLancamentos = (cpf, lancamentos) => {
 }
 
 const recuperarMaioresSaldos = (lancamentos) => {
-   let saldos = {};
+   const saldos = {};
 
 // percorrer o array dos lançamentos e adicionar o saldo
 
@@ -37,5 +37,38 @@ const recuperarMaioresSaldos = (lancamentos) => {
 }
 
 const recuperarMaioresMedias = (lancamentos) => {
-    return []
+   let saldos = {};
+  let medias = [];
+  
+  // percorre o array de lançamentos para calcular o saldo de cada CPF
+  for (let lancamento of lancamentos) {
+    let cpf = lancamento.cpf;
+    let valor = lancamento.valor;
+
+    if (saldos[cpf] === undefined) {
+      saldos[cpf] = 0;
+    }
+
+    saldos[cpf] += valor;
+  }
+
+  // percorre o objeto de saldos para calcular a média de cada CPF
+  for (let cpf in saldos) {
+    let media = saldos[cpf] / lancamentos.filter(l => l.cpf === cpf).length;
+    medias.push({cpf: cpf, media: media});
+  }
+
+  // ordena as médias do maior para o menor saldo médio
+  medias.sort((a, b) => b.media - a.media);
+
+  // cria um array com os três CPFs com maiores saldos médios
+  let maioresSaldosMedios = [];
+  for (let i = 0; i < 3 && i < medias.length; i++) {
+    maioresSaldosMedios.push({
+      cpf: medias[i].cpf,
+      valor: medias[i].media.toFixed(2)
+    });
+  }
+
+  return maioresSaldosMedios;
 }
