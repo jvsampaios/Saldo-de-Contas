@@ -1,11 +1,19 @@
 const validarEntradaDeDados = (lancamento) => {
+ 
+// Verifica se o CPF é válido
+
+if (lancamento.cpf.length != 11 ||
+  isNaN(lancamento.cpf) != false || // verifica se o valor não é um número
+  (/^(\d)\1+$/.test(lancamento.cpf)) // verifica se um mesmo número é repetido várias vezes
   
-// Calcula os dígitos verificadores
+  )
+  return "Esse CPF não possui valor válido";
+
+// Calcula os dígitos verificadores do CPF
 
    var soma = 0;
    var resto;
-   if(lancamento.cpf == null)
-      return "Esse CPF não possui valor válido";
+   
    for (i=1; i<=9; i++)
       soma = soma + parseInt(lancamento.cpf.substring(i-1, i)) * (11 - i);
 
@@ -30,15 +38,6 @@ const validarEntradaDeDados = (lancamento) => {
    if (resto != parseInt(lancamento.cpf.substring(10, 11) ) )
       return "Esse CPF não possui valor válido";
 
-// Verifica se o CPF é válido
-
-   if (lancamento.cpf.length != 11 ||
-      isNaN(lancamento.cpf) != false || 
-      (/^(\d)\1+$/.test(lancamento.cpf)) 
-      
-      )
-      return "Esse CPF não possui valor válido";
-
 // Verifica se o valor é válido
 
    else if (lancamento.valor == null || 
@@ -60,7 +59,7 @@ const validarEntradaDeDados = (lancamento) => {
 
 const recuperarSaldosPorConta = (lancamentos) => {
 
-   var saldos = {};
+  var saldos = {};
 
 // percorrer todo o array de lançamentos e adicionar o saldo de cada CPF
 
@@ -85,105 +84,102 @@ const recuperarSaldosPorConta = (lancamentos) => {
    return a[0] - b[0];
  });
 
-// Retorna o novo array
+ // Retorna o novo array
 
   return resultado;
 }
 
 const recuperarMaiorMenorLancamentos = (cpf, lancamentos) => {
   
-   // cria um objeto para armazenar os saldos de cada CPF
   var saldos = {};
-
-  // variável para guardar o último CPF utilizado
   var ultimoCPF = '';
+  var resultado = [];
 
-   // percorre os lançamentos e soma os valores correspondentes a cada CPF
+// percorre os lançamentos e soma os valores de cada CPF
   for (var i = 0; i < lancamentos.length; i++) {
     var cpf = lancamentos[i].cpf;
     var valor = lancamentos[i].valor;
     if (!saldos[cpf]) {
       saldos[cpf] = [valor, valor];
     } else {
-      if (valor > saldos[cpf][0]) {
+       if (valor > saldos[cpf][0]) {
         saldos[cpf][0] = valor;
-      } else if (valor < saldos[cpf][1]) {
+       } else if (valor < saldos[cpf][1]) {
         saldos[cpf][1] = valor;
-      }
-    }
-    ultimoCPF = cpf; // atualiza o último CPF utilizado
+       }
+     }
+     
+     ultimoCPF = cpf; // atualiza o último CPF utilizado
+    
   }
 
-  // cria um array para armazenar o resultado
-  var resultado = [];
-
-  // percorre o objeto de saldos e adiciona os maiores e menores valores ao resultado
+ 
+// percorre o objeto de saldos adicionando os maiores e menores valores
   for (var cpf in saldos) {
     resultado.push({cpf:ultimoCPF,valor:saldos[cpf][0]});
     resultado.push({cpf:ultimoCPF,valor:saldos[cpf][1]});
   }
 
-  // ordena o resultado pelo CPF
+ 
+// ordena o resultado
   resultado.sort(function(a, b) {
-    return a[0] > b[0] ? 1 : -1;
-  });
+    return a.valor - b.valor;
+   });
 
-  // retorna o resultado
+   resultado = resultado.slice(0, 2);
+ 
   return resultado;
 }
 
 const recuperarMaioresSaldos = (lancamentos) => {
    const saldos = {};
 
-// percorrer o array dos lançamentos e adicionar o saldo
+// percorrer o array lançamentos e adiciona o saldo
 
    for (let lancamento of lancamentos) {
-     let cpf = lancamento.cpf;
-     let valor = lancamento.valor;
+    let cpf = lancamento.cpf;
+    let valor = lancamento.valor;
  
      if (saldos[cpf]) {
-       saldos[cpf] += valor;
+      saldos[cpf] += valor;
      } else {
-       saldos[cpf] = valor;
+      saldos[cpf] = valor;
      }
    }
  
 // mostrar os maiores saldos 
 
-   let maioresSaldos = Object.entries(saldos)
-     .sort((a, b) => b[1] - a[1]) // ordenar os elementos do array
-     .slice(0, 3)  // divide o array para pegar apenas os 3 primeiros
-     .map((item) => ({ cpf: item[0], valor: item[1] })); // cria um novo array com os resultados apresentados
+  let maioresSaldos = Object.entries(saldos)
+    .sort((a, b) => b[1] - a[1]) // ordenar os elementos do array
+    .slice(0, 3)  // divide o array para pegar apenas os 3 primeiros
+    .map((item) => ({ cpf: item[0], valor: item[1] })); // cria um novo array com os resultados apresentados
  
-   return maioresSaldos;
+  return maioresSaldos;
 }
 
 const recuperarMaioresMedias = (lancamentos) => {
-   let saldos = {};
+  let saldos = {};
   let medias = [];
   
-  // percorre o array de lançamentos para calcular o saldo de cada CPF
+// percorre o array de lançamentos para calcular o saldo de cada CPF
   for (let lancamento of lancamentos) {
     let cpf = lancamento.cpf;
     let valor = lancamento.valor;
-
     if (saldos[cpf] === undefined) {
       saldos[cpf] = 0;
     }
-
     saldos[cpf] += valor;
   }
 
-  // percorre o objeto de saldos para calcular a média de cada CPF
+// percorre o objeto de saldos para calcular a média de cada CPF
   for (let cpf in saldos) {
     let media = saldos[cpf] / lancamentos.filter(l => l.cpf === cpf).length;
     medias.push({cpf: cpf, media: media});
   }
 
-  // ordena as médias do maior para o menor saldo médio
-  medias.sort((a, b) => b.media - a.media);
+  medias.sort((a, b) => b.media - a.media); // ordena as médias do maior para o menor saldo médio
 
-  // cria um array com os três CPFs com maiores saldos médios
+// cria um array com os três CPFs com maiores saldos médios
   let maioresSaldosMedios = [];
   for (let i = 0; i < 3 && i < medias.length; i++) {
     maioresSaldosMedios.push({
